@@ -1,4 +1,4 @@
-package com.saurabh.springframeoworkguru.SpringBootApp.persistence.entities;
+package com.saurabh.sfguru.SpringBootApp.persistence.entities;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +10,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 public class Book {
@@ -22,21 +25,40 @@ public class Book {
 	
 	private String isbn;
 	
+	@OneToOne
+	private Publisher publisher;
+	
 	/*
-	 * name="book_author" specifies the name of the join table, and we specify which columns to be used for joining, with whom(inverse columns)
+	 * name="book_author" specifies the name of the join table, and we specify which columns to be used for joining, with whom (inverse columns)
 	 * Don't know how this will play when there are multiple columns.
+	 * Now if you don't mention a join table then the default would be HB would create 2 join tables, BOOK_AUTHOR and another AUTHOR_BOOK.
+	 * And that's not neat, repeatable, so we specifically mention the join table and the columns that need to be joined.
+	 * 
 	 */
 	@ManyToMany
 	@JoinTable(name="book_author", joinColumns = @JoinColumn(name="book_id"), 
 				inverseJoinColumns= @JoinColumn(name="author_id"))  
 	private Set<Author> authors = new HashSet<>();
 
-	public Book(Long id, String title, String isbn, Set<Author> authors) {
+	
+	/*
+	 * Default constructor is needed for the view models 
+	 */
+	public Book() {
+	}
+	
+	public Book(String title, String isbn, String publisher, Set<Author> authors ) {
 		super();
-		this.id = id;
 		this.title = title;
 		this.isbn = isbn;
 		this.authors = authors;
+	}
+	
+	public Book(String title, String isbn, Publisher publisher) {
+		super();
+		this.title = title;
+		this.isbn = isbn;
+		this.publisher = publisher;
 	}
 	
 	public Long getId() {
@@ -102,13 +124,12 @@ public class Book {
 		return true;
 	}
 
+	public Publisher getPublisher() {
+		return publisher;
+	}
 
-	
-	
-	
-	
-	
-	
-	
+	public void setPublisher(Publisher publisher) {
+		this.publisher = publisher;
+	}
 	
 }
